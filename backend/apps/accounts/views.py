@@ -116,7 +116,6 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer.save(
                 organization=user.organization,
                 role=user.role
-                
             )
 
         else:

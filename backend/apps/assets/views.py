@@ -1,6 +1,6 @@
 from django.db.models import Q, Sum
 
-from rest_framework import viewsets
+from rest_framework import viewsets, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -16,10 +16,23 @@ class AssetViewSet(viewsets.ModelViewSet):
     ]
 
     def get_queryset(self):
+        user = self.request.user
+
+        # User must belong to an organization
+        if not user.is_authenticated or not user.organization:
+            return Asset.objects.none()
+
         queryset = (
             Asset.objects
-            .all()
-            .select_related("project")
+            .filter(
+                organization=user.organization
+            )
+            .select_related(
+                "project",
+                "organization",
+                "created_by",
+                "updated_by",
+            )
             .prefetch_related(
                 "server_spec",
                 "storage_spec",
@@ -59,6 +72,32 @@ class AssetViewSet(viewsets.ModelViewSet):
 
         return queryset
 
+    def perform_create(self, serializer):
+        user = self.request.user
+
+        if not user.organization:
+            raise permissions.PermissionDenied(
+                "User is not associated with an organization."
+            )
+
+        serializer.save(
+            organization=user.organization,
+            created_by=user,
+        )
+
+    def perform_update(self, serializer):
+        user = self.request.user
+
+        if not user.organization:
+            raise permissions.PermissionDenied(
+                "User is not associated with an organization."
+            )
+
+        serializer.save(
+            organization=user.organization,
+            updated_by=user,
+        )
+
     @action(
         detail=False,
         methods=["get"],
@@ -90,3 +129,4 @@ class AssetViewSet(viewsets.ModelViewSet):
             "total": total,
             "by_type": by_type,
         })
+        

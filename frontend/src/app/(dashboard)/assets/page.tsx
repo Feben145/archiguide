@@ -7,7 +7,7 @@ import { Badge, statusVariant } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { Modal } from '@/components/ui/Modal'
 import { FormGroup, Input, Select, Textarea } from '@/components/ui/Input'
-import { Plus, Search, Upload } from 'lucide-react'
+import { Plus, Search, Upload,Download } from 'lucide-react'
 import api from '@/lib/api'
 import type { Asset } from '@/lib/types'
 import { ImportModal } from '@/components/ui/ImportModal'
@@ -156,12 +156,12 @@ const STORAGE_TYPE_CHOICES = [
 ]
 
 const MEDIA_TYPE_CHOICES = [
-  'all_nvme',
-  'all_ssd',
+  'nvme',
+  'ssd',
   'hybrid',
-  'all_hdd',
-  'tape_lto8',
-  'tape_lto9',
+  'hdd',
+  'tape',
+ // 'tape_lto9',
   'cloud',
 ]
 
@@ -669,6 +669,79 @@ const handleCreate = async () => {
     setCreating(false)
   }
 }
+
+// -------------------------------------------------------------------------
+// Download assets as CSV
+// -------------------------------------------------------------------------
+const handleDownload = () => {
+  if (!assets.length) {
+    return
+  }
+
+  const headers = [
+    'Asset ID',
+    'Name',
+    'Project',
+    'Quantity',
+    'OS / Firmware',
+    'Capacity / Spec',
+    'Type',
+    'Deployment Model',
+    'Environment',
+    'Location',
+    'Status',
+    'Notes',
+  ]
+
+  const rows = assets.map((asset: any) => [
+    asset.asset_code ?? '',
+    asset.name ?? '',
+    asset.project_name ?? '',
+    asset.quantity ?? 1,
+    getOsOrFirmware(asset),
+    getCapacitySpec(asset),
+    label(asset.asset_type),
+    label(asset.deployment_model || 'on_prem'),
+    label(asset.environment || 'prod'),
+    asset.site_name || asset.location || '',
+    label(asset.status),
+    asset.notes ?? '',
+  ])
+
+  const escapeCsvValue = (value: any) => {
+    const stringValue = String(value ?? '')
+
+    return `"${stringValue.replace(/"/g, '""')}"`
+  }
+
+  const csv = [
+    headers.map(escapeCsvValue).join(','),
+    ...rows.map(row =>
+      row.map(escapeCsvValue).join(',')
+    ),
+  ].join('\r\n')
+
+  const blob = new Blob(
+    ['\uFEFF' + csv],
+    {
+      type: 'text/csv;charset=utf-8;',
+    }
+  )
+
+  const url = URL.createObjectURL(blob)
+
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `asset-registry-${new Date()
+    .toISOString()
+    .slice(0, 10)}.csv`
+
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+
+  URL.revokeObjectURL(url)
+}
   // -------------------------------------------------------------------------
   // Form helpers
   // -------------------------------------------------------------------------
@@ -882,7 +955,13 @@ function getCapacitySpec(asset: any) {
           >
             Import CSV
           </Button>*/}
-
+<Button
+    icon={<Download size={13} />}
+    onClick={handleDownload}
+    disabled={assets.length === 0}
+  >
+    Download CSV
+  </Button>
           <Button
             variant="primary"
             icon={<Plus size={13} />}
@@ -1270,13 +1349,14 @@ function getCapacitySpec(asset: any) {
               </Select>
             </FormGroup>
 
-            <FormGroup label="Tags (comma separated)">
+           {/*} <FormGroup label="Tags (comma separated)">
               <Input
                 value={form.tags}
                 onChange={set('tags')}
                 placeholder="e.g. pci-scope, tier1, legacy"
               />
             </FormGroup>
+            */}
           </div>
         )}
 
@@ -1314,7 +1394,7 @@ function getCapacitySpec(asset: any) {
               <Input
                 value={form.cloud_provider}
                 onChange={set('cloud_provider')}
-                placeholder="Azure / AWS / GCP"
+                placeholder="HCS/ AWS / GCP"
               />
             </FormGroup>
 
@@ -1322,7 +1402,7 @@ function getCapacitySpec(asset: any) {
               <Input
                 value={form.cloud_region}
                 onChange={set('cloud_region')}
-                placeholder="e.g. East US 2"
+                placeholder="e.g. Region 3"
               />
             </FormGroup>
 
@@ -1381,7 +1461,7 @@ function getCapacitySpec(asset: any) {
                   <Input
                     value={serverSpec.solution_name}
                     onChange={setSpec(setServerSpec)('solution_name')}
-                    placeholder="e.g. SAP ERP"
+                    placeholder="e.g. DNS OSS ERP"
                   />
                 </FormGroup>
 
@@ -1614,7 +1694,7 @@ function getCapacitySpec(asset: any) {
               <Input
         value={backupSpec.backup_software}
         onChange={setSpec(setBackupSpec)('backup_software')}
-        placeholder="e.g. Veeam B&R"
+        placeholder="e.g. NDP"
       />
     </FormGroup>
 
