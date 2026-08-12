@@ -1,0 +1,134 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #ffffff;
+
+  --bg-2: #ffffff;
+  --bg-3: #f8fafc;
+  --bg-4: #f1f5f9;
+  --bg-5: #e2e8f0;
+
+  --text: #111827;
+  --text-1: #111827;
+  --text-2: #374151;
+  --text-3: #6b7280;
+  --text-4: #9ca3af;
+
+  --border-1: #e5e7eb;
+  --border-2: #d1d5db;
+  --border-3: #9ca3af;
+  --border-4: #6b7280;
+}
+
+.dark {
+  --bg: #08090e;
+
+  --bg-2: #10121a;
+  --bg-3: #171a24;
+  --bg-4: #202431;
+  --bg-5: #2a2f3d;
+
+  --text: #eef0f8;
+  --text-1: #eef0f8;
+  --text-2: #b8bdcc;
+  --text-3: #858b9d;
+  --text-4: #555b70;
+
+  --border-1: rgba(255,255,255,0.04);
+  --border-2: rgba(255,255,255,0.08);
+  --border-3: rgba(255,255,255,0.13);
+  --border-4: rgba(255,255,255,0.21);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { height: 100%; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  overflow: hidden;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+
+/* Font utilities */
+.font-syne  { font-family: 'Syne', sans-serif; }
+.font-mono  { font-family: 'JetBrains Mono', monospace; }
+
+/* Smooth scroll in panels */
+.scroll-panel { overflow-y: auto; }
+
+/* Animate in */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-page { animation: fadeUp 0.18s ease; }
+
+/* Streaming cursor */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+.stream-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 13px;
+  background: #5b6ef5;
+  animation: blink 0.8s infinite;
+  vertical-align: middle;
+  margin-left: 2px;
+}
+
+/* Progress bar */
+.progress-bar {
+  height: 3px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 20px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 20px;
+  background: #5b6ef5;
+  transition: width 0.4s ease;
+}
+
+/* Table base */
+table { width: 100%; border-collapse: collapse; }
+th {
+  text-align: left;
+  padding: 9px 12px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  border-bottom: 1px solid var(--border-2);
+}
+
+td {
+  padding: 11px 12px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border-1);
+  color: var(--text-1);
+  vertical-align: middle;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover td {
+  background: var(--bg-3);
+}
+/* Phase indicator */
+.phase-active { color: #f59e0b; background: rgba(245,158,11,0.06); }
+.phase-done   { color: #10b981; }

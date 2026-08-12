@@ -1,0 +1,35 @@
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Python / Django
+backend/venv/
+backend/.venv/
+backend/__pycache__/
+backend/**/__pycache__/
+*.pyc
+
+# Django generated/local files
+backend/db.sqlite3
+backend/media/
+backend/staticfiles/
+
+# Node / Next.js
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+
+# Logs
+*.log
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Python tooling
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/

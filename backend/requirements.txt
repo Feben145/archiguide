@@ -1,0 +1,16 @@
+Django==4.2.11
+djangorestframework==3.15.1
+djangorestframework-simplejwt==5.3.1
+django-cors-headers==4.3.1
+psycopg[binary]==3.2.13
+groq==0.9.0
+python-dotenv==1.0.1
+Pillow==10.4.0
+python-docx==1.1.0
+reportlab==4.1.0
+django-filter==24.2
+drf-spectacular==0.27.2
+celery==5.3.6
+redis==5.0.3
+gunicorn==21.2.0
+whitenoise==6.6.0
